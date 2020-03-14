@@ -1,7 +1,9 @@
 FROM ibm_java
 MAINTAINER Giles Gamon "giles@lsiarchi.consulting"
 
+RUN yum install -y openssl
+
 ADD safe /tmp/safe
 RUN git clone https://github.com/gilesgamon/ssl-wmq-camel-sqs-broker.git
-RUN cd ssl-wmq-camel-sqs-broker && source /tmp/safe/secrets && ./parse_params && mvn clean install && cp target/*jar /tmp && cp server-chain.jks /tmp
+RUN cd ssl-wmq-camel-sqs-broker && source /tmp/safe/secrets && ./parse_params && mvn clean install && cp target/*jar /tmp && cp src/main/resources/server-chain.jks /tmp
 RUN rm -rf /tmp/safe

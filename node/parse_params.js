@@ -7,7 +7,7 @@ var required_env_params = ["AWS_CRED", "CAMEL_VALUES", "CLIENT_KEY", "CLIENT_CRT
 
 function checkEnv (env_name) {
 	// crach out if we haven't been given correct env params
-    if (!process.env.env_name) {
+    if (!process.env[env_name]) {
         console.log(`Issue accessing Env ${env_name}`)
         process.exit(1)
     }
