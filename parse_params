@@ -5,7 +5,7 @@ LIST="ACCESS_KEY SECRET_KEY QUEUE_MANAGER MQ_HOSTNAME MQ_PORT MQ_CHANNEL MQ_REQU
 for var in $LIST; do
 	if [ "${!var}" == "" ] ; then
 		echo "$var not set"
-		exit
+		exit 1
 	fi
 done
 # Backup out properties file

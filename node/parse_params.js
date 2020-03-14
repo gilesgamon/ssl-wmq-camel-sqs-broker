@@ -66,6 +66,7 @@ function prepare(event, context, options = null) {
             console.log(`Replacement of ${options.from} results:`, results);
         } catch (error) {
             console.error('Error occurred:', error);
+            process.exit(1)
         }
     }
 

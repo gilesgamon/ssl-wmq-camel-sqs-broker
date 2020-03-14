@@ -4,24 +4,26 @@ made doing the SSL easy.
 
 Usage:
 
-WIP but - in principle loads some vars (see below) and run 'cd docker ; ./build.sh', should deliver back an executable (fat) jar and a server-chain.jks. Terraform to follow.
+WIP but - in principle load some vars (see below) and run 'cd docker ; ./build.sh', should deliver back an executable (fat) jar and a server-chain.jks. Terraform to follow.
 
-Now you should have a jar in taregt and a server-chain.jks - copy these to another machine (if required), which has IBM Java installed and use the startup scipts to run it.
+Now you should have a jar in target and a server-chain.jks - copy these to another machine (if required), which has IBM Java installed and use the startup scipts to run it.
 
 This is designed to (ultimately) be run in AWS with configuration held in SecretsManager / SSM. The help achieve this, the configuration is expected to he put into ENV vars
 a further iteration of this is expected to switch that to a single var with a JSON structure. TO DO
 
 Test Operation:
 You can use the SQS console to select a queue (mq_request) and submit a test message: for example {"type":"login", "payload":{"name":"giles", "city":"Altrincham"}}
-This message should be picked up by the camel, routed to the MQ_REQUEST_QUEUE, then (for testing purposes) camel will move it to the MQ response queue
+This message should be picked up by the camel, routed to the MQ_REQUEST_QUEUE, then (for testing purposes) camel will move it to the MQ_RESPONSE_QUEUE
 camel will then find a response and move that back to SQS mq_reply.
+
+Mix of build tools - bash to do some basic admin stuff. Some NodeJS to handle slightly fidlier stuff that, in principle, I would have preferred to do with sed. Docker, which builds jar file (using maven) and clones this.
 
 Non-test:
 Remove the MQ-MQ route in camel-context.xml and rebuild the jar
 
 TODO List
 
-Repo to build (using Docker) the jar file, having installed IBM Java, so that it can be deployed without maven and a lot of in-situ build process.
+DONE-ish (WIP): Repo to build (using Docker) the jar file, having installed IBM Java, so that it can be deployed without maven and a lot of in-situ build process.
 Develop terraform (possibly related to above) to deploy artefacts
 Tidy paramater handling (json perhaps)
 Extend the number of parameters configured through said json (for example SQS queue names, performance parameters)
@@ -36,7 +38,7 @@ VARS required:
 export ACCESS_KEY=''
 export SECRET_KEY=''
 
-// Just the raw PEM text on a single line (not CR)
+// Just the raw PEM text : had to write a small (messy) handler to tidy this up
 export CLIENT_KEY=''
 export CLIENT_CRT=''
 export ROOT_PEM=''
