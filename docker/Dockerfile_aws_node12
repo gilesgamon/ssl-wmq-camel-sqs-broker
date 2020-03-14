@@ -1,0 +1,12 @@
+FROM amazonlinux:2
+MAINTAINER Giles Gamon "giles@lsiarchi.consulting"
+#https://docs.aws.amazon.com/lambda/latest/dg/lambda-runtimes.html
+
+RUN yum -y update
+#RUN yum -y groupinstall "Development Tools"
+#RUN yum -y install deltarpm openssl-devel bzip2-devel libffi-devel wget cmake
+
+RUN curl -sL https://rpm.nodesource.com/setup_12.x | bash -
+RUN yum clean all && yum makecache fast
+RUN yum install -y deltarpm gcc-c++ make
+RUN yum install -y nodejs

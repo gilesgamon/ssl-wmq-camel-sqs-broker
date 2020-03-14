@@ -1,0 +1,16 @@
+FROM node12
+MAINTAINER Giles Gamon "giles@lsiarchi.consulting"
+
+RUN yum install -y zip unzip
+RUN yum install -y git curl tar wget make gzip zip zlib-devel gcc openssl-devel bzip2-devel libffi-devel file hostname
+
+# I keep a local copy in my 'safe' to avoid re-downloading
+#ADD ibm-java-x86_64-sdk-8.0-6.6.bin /tmp
+RUN cd /tmp && curl -o ibm-java-x86_64-sdk-8.0-6.6.bin http://public.dhe.ibm.com/ibmdl/export/pub/systems/cloud/runtimes/java/8.0.6.6/linux/x86_64/ibm-java-x86_64-sdk-8.0-6.6.bin
+RUN chmod +x /tmp/ibm-java-x86_64-sdk-8.0-6.6.bin
+ADD ibm_java_install_response_file /tmp
+RUN /tmp/ibm-java-x86_64-sdk-8.0-6.6.bin -i silent -f /tmp/ibm_java_install_response_file
+ENV JAVA_HOME=/opt/ibm/java-x86_64-80
+ENV PATH=$JAVA_HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+RUN yum install -y maven
+RUN rm -f /tmp/ibm-java-x86_64-sdk-8.0-6.6.bin /tmp/ibm_java_install_response_file

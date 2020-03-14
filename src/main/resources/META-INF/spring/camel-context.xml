@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans  xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:camel="http://camel.apache.org/schema/spring"
+        xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://camel.apache.org/schema/spring
+           http://camel.apache.org/schema/spring/camel-spring.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.2.xsd
+       ">
+    <context:property-placeholder location="classpath:/broker.properties" />
+
+    <bean id="SSLConfiguration" class="consulting.lsiarchi.mqb.SSLConfiguration">
+        <property name="keystore" value="${ssl.keystore}" />
+        <property name="keystorePassword" value="${ssl.keystore.password.secure}" />
+        <property name="keystoreProvider" value="SUN" />
+        <property name="keystoreType" value="${ssl.key-store-type}" />
+        <property name="truststoreProvider" value="${ssl.key-store-provider}" />
+        <property name="truststore" value="${ssl.truststore}" />
+        <property name="certAlias" value="${ibm.certAlias}" />
+        <property name="CipherSuite" value="${ibm.ciphersuite}" />
+        <property name="protocols" value="${ibm.protocols}" />
+        <property name="useIBMCipherMappings" value="true" />
+    </bean>
+
+    <bean id="connectionFactoryConfig" class="org.apache.camel.component.jms.JmsConfiguration">
+        <property name="connectionFactory" ref="secureConnectionFactory" />
+        <property name="concurrentConsumers" value="${ibm.concurrentConsumers}" />
+        <property name="maxConcurrentConsumers" value="${ibm.maxConcurrentConsumers}" />
+        <property name="maxMessagesPerTask" value="${ibm.maxMessagesPerTask}" />
+        <property name="receiveTimeout" value="${ibm.receiveTimeout}" />
+        <property name="idleConsumerLimit" value="${ibm.idleConsumerLimit}" />
+    </bean>
+
+    
+    <bean id="mqConnectionFactory" class="com.ibm.mq.jms.MQQueueConnectionFactory">
+        <property name="hostName" value="${ibm.hostName}" />
+        <property name="port" value="${ibm.port}" />
+        <property name="queueManager" value="${ibm.queueManager}" />
+        <property name="channel" value="${ibm.channel}"/>
+        <property name="transportType" value="${ibm.transportType}"/>
+        <property name="sSLCipherSuite" value="${ibm.ciphersuite}" />
+    </bean>
+
+    <bean id="ibmMQ" class="org.apache.camel.component.jms.JmsComponent">
+        <property name="configuration" ref="connectionFactoryConfig" />
+    </bean>
+
+    <bean id="secureConnectionFactory" class="org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter">
+        <property name="targetConnectionFactory" ref="mqConnectionFactory" />
+    </bean>
+
+    <bean id="awsRegion" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetClass" value="com.amazonaws.regions.RegionUtils" />
+        <property name="targetMethod" value="getRegion" />
+        <property name="arguments">
+            <list>
+                <value>eu-west-1</value>
+            </list>
+        </property>
+    </bean>
+    <bean id="sqsClient" class="com.amazonaws.services.sqs.AmazonSQSClient">
+        <constructor-arg>
+            <bean class="com.amazonaws.auth.BasicAWSCredentials">
+                <constructor-arg value="${access.key}" />
+                <constructor-arg value="${secret.key}" />
+            </bean>
+        </constructor-arg>
+        <property name="region" ref="awsRegion" />
+    </bean>
+
+    <camelContext id="sqsToMq" xmlns="http://camel.apache.org/schema/spring">
+        <propertyPlaceholder id="properties" location="classpath:/broker.properties" />
+        <route id="sqsToMq">
+            <from uri="aws-sqs://mq_request?amazonSQSClient=#sqsClient&amp;concurrentConsumers=5&amp;greedy=true" />
+            <to uri="ibmMQ:{{ibm.requestqueue}}" />
+<!--             <log message="From SQS to MQ ${body} ${date:now:MMDDyy-HHmmss}" />
+            <to uri="log:like-to-see-all?level=INFO&amp;showAll=true&amp;multiline=true" />
+ -->        </route>
+        <route id="mqToMq">
+            <from uri="ibmMQ:{{ibm.requestqueue}}" />
+            <log message="From MQ to MQ ${body} ${date:now:MMDDyy-HHmmss}" />
+            <to uri="ibmMQ:{{ibm.responsequeue}}?preserveMessageQos=true" />
+        </route>
+        <route id="mqToSqs">
+            <from uri="ibmMQ:{{ibm.responsequeue}}" />
+            <removeHeaders pattern="*" excludePattern="breadcrumbId|CamelAwsSqsMessageId|JMSCorrelationID|JMSCorrelationIDAsBytes|JMSMessageID|JMSReplyTo" />
+            <to uri="aws-sqs://mq_reply?amazonSQSClient=#sqsClient" />
+<!--             <log message="From MQ to SQS ${body} ${date:now:MMDDyy-HHmmss}" />
+            <to uri="log:like-to-see-all?level=INFO&amp;showAll=true&amp;multiline=true" />
+ -->        </route>
+    </camelContext>
+</beans>

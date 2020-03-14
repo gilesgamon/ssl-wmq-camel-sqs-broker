@@ -1,0 +1,20 @@
+#!/bin/bash
+
+LIST="ACCESS_KEY SECRET_KEY QUEUE_MANAGER MQ_HOSTNAME MQ_PORT MQ_CHANNEL MQ_REQUEST_QUEUE MQ_RESPONSE_QUEUE MQ_CIPHER"
+# Before we get started, just check we have all the vars we need
+for var in $LIST; do
+	if [ "${!var}" == "" ] ; then
+		echo "$var not set"
+		exit
+	fi
+done
+# Backup out properties file
+if [ -z /tmp/broker.properties ] ; then
+	cp -n src/main/resources/broker.properties /tmp/broker.properties
+fi
+chmod +x jks_generate
+cd node
+npm i
+node parse_params.js prepare
+cd ..
+./jks_generate
