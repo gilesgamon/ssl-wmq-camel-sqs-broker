@@ -4,7 +4,7 @@ made doing the SSL easy.
 
 Usage:
 
-WIP but - in principle load some vars (see below) and run 'cd docker ; ./build.sh', should deliver back an executable (fat) jar and a server-chain.jks. Terraform to follow.
+WIP but - in principle load some vars (see below) and run './parse_params' and assuming you got that working correctly 'cd docker ; ./build.sh', should deliver back an executable (fat) jar and a server-chain.jks. Terraform to follow.
 
 Now you should have a jar in target and a server-chain.jks in an artefacts directory - copy these to another machine (if required), which has IBM Java installed and use the startup scipts to run it.
 
