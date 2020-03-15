@@ -6,7 +6,7 @@ Usage:
 
 WIP but - in principle load some vars (see below) and run 'cd docker ; ./build.sh', should deliver back an executable (fat) jar and a server-chain.jks. Terraform to follow.
 
-Now you should have a jar in target and a server-chain.jks - copy these to another machine (if required), which has IBM Java installed and use the startup scipts to run it.
+Now you should have a jar in target and a server-chain.jks in an artefacts directory - copy these to another machine (if required), which has IBM Java installed and use the startup scipts to run it.
 
 This is designed to (ultimately) be run in AWS with configuration held in SecretsManager / SSM. The help achieve this, the configuration is expected to he put into ENV vars
 a further iteration of this is expected to switch that to a single var with a JSON structure. TO DO
@@ -31,6 +31,8 @@ Test implementation & auto remove of the MQ-MQ loopback route
 Paramatise / for-loop setup for routes: allow extensible number of router
 Tidy the server-chain.jks, which ought to be fully embedded / or fully externailsed from jar
 Provide terraform for creation of IAM role, with minimum specific capabilities for SQS
+Some version tagging and paramtisation through the code
+Restructure some components (xml in particular) to out the stuff that is version list / plumbing stuff away from the stuff more interesting stuff (routes in particular)
 
 
 VARS required:

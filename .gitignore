@@ -1,9 +1,11 @@
+*.bin
+*.class
 .idea
 *.iml
-target
-*.class
 *jks
 *pem
-safe
+artefacts
 node_modules
+safe
 secrets
+target
