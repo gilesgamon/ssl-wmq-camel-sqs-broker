@@ -1,0 +1,13 @@
+[Unit]
+ Description = camel-router Service
+ After network.target = camel-router.service
+[Service]
+ Type = forking
+ Restart=always
+ RestartSec=1
+ SuccessExitStatus=143 
+ ExecStart = /usr/local/bin/camel-router.sh start
+ ExecStop = /usr/local/bin/camel-router.sh stop
+ ExecReload = /usr/local/bin/camel-router.sh reload
+[Install]
+ WantedBy=multi-user.target

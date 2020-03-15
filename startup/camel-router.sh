@@ -1,12 +1,15 @@
 #!/bin/sh 
 
-# Install as /usr/local/bin/CamelRouter.sh
-# Call by installing CamelRouter.service in /etc/systemd/system/ & then systemctl enable/start CamelRouter
+# Install as /usr/local/bin/camel-router.sh
+# Call by installing camel-router.service in /etc/systemd/system/multi-user.target.wants/ & then systemctl enable/start camel-router
 
-SERVICE_NAME=CamelRouter 
-PATH_TO_JAR=/home/ec2-user/broker-1.0-SNAPSHOT.jar
-PID_PATH_NAME=/tmp/CamelRouter-pid
+SERVICE_NAME=camel-router
+HOME_PATH=/home/ec2-user
+PATH_TO_JAR=$HOME_PATH/broker-1.0-SNAPSHOT.jar
+PID_PATH_NAME=/tmp/camel-router-pid
 JAVA_HOME=/opt/ibm/java-x86_64-80
+PATH=$JAVA_HOME/bin:$PATH
+cd $HOME_PATH
 case $1 in 
 start)
        echo "Starting $SERVICE_NAME ..."
