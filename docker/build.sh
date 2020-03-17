@@ -2,14 +2,14 @@
 
 docker build . -f Dockerfile_aws_node12 -t node12
 docker build . -f Dockerfile_ibm_java -t ibm_java
-docker build . -f Dockerfile_camelrouterbuild -t camelrouterbuild
-docker create --name tempCamel camelrouterbuild
+docker build . -f Dockerfile_camel_router_build -t camel_router_build
+docker create --name tempCamel camel_router_build
 mkdir -p ../artefacts
 docker cp tempCamel:/tmp/server-chain.jks .
 docker cp tempCamel:/tmp/broker-1.0-SNAPSHOT.jar .
 docker rm tempCamel
 # Now use a clean container, to build a runtime (without Maven etc)
-docker build . -f Dockerfile_came_router_runtime -t camelrouterruntime
+docker build . -f Dockerfile_camel_router_runtime -t camel_router_runtime
 mv ./server-chain.jks ../artefacts
 mv ./broker-1.0-SNAPSHOT.jar ../artefacts
 # To upload via s3 for user_data, things got complicated - doing via an s3 single upload should be easier (for EC2 / other deployment)
