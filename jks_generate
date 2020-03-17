@@ -13,3 +13,5 @@ keytool -importkeystore -srckeystore clientKeyStore.p12 -srcstoretype pkcs12 -de
 keytool -changealias -keystore client.jks -alias 1 -destalias client -storepass changeit
 mv *jks src/main/resources
 rm -f *pem *crt *key *p12
+
+echo "Good to GO!"

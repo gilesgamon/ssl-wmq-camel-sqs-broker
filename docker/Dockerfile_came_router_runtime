@@ -1,0 +1,9 @@
+FROM ibm_java
+MAINTAINER Giles Gamon "giles@lsiarchi.consulting"
+
+RUN mkdir /opt/camel-router
+ADD server-chain.jks /opt/camel-router/server-chain.jks
+ADD broker-1.0-SNAPSHOT.jar /opt/camel-router/broker-1.0-SNAPSHOT.jar
+WORKDIR /opt/camel-router
+
+ENTRYPOINT ["java", "-jar", "broker-1.0-SNAPSHOT.jar"]

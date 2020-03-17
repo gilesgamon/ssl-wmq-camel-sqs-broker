@@ -8,18 +8,14 @@
   "author": "Giles@lsiarchi.consulting",
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.392.0",
-    "esm": "^3.1.1",
+    "aws-sdk": "^2.639.0",
+    "esm": "^3.2.25",
     "make-runnable": "^1.3.6",
+    "minimist": "^1.2.5",
     "replace-in-file": "^5.0.2",
-    "request": "^2.88.2",
-    "request-promise": "^4.2.4"
+    "request-promise": "^4.2.5"
   },
   "devDependencies": {
-    "eslint": "^5.16.0",
-    "fs": "0.0.1-security",
-    "path": "^0.12.7",
-    "webpack": "^4.29.0"
   },
   "description": "Just to neatly parse the config, which was proving a bit too complex to do with bash"
 }

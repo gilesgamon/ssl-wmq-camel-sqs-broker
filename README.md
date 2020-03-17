@@ -23,16 +23,18 @@ Remove the MQ-MQ route in camel-context.xml and rebuild the jar
 
 TODO List
 
-DONE-ish (WIP): Repo to build (using Docker) the jar file, having installed IBM Java, so that it can be deployed without maven and a lot of in-situ build process.
-Develop terraform (possibly related to above) to deploy artefacts
 Tidy paramater handling (json perhaps)
 Extend the number of parameters configured through said json (for example SQS queue names, performance parameters)
 Test implementation & auto remove of the MQ-MQ loopback route
 Paramatise / for-loop setup for routes: allow extensible number of router
 Tidy the server-chain.jks, which ought to be fully embedded / or fully externailsed from jar
-Provide terraform for creation of IAM role, with minimum specific capabilities for SQS
 Some version tagging and paramtisation through the code
 Restructure some components (xml in particular) to out the stuff that is version list / plumbing stuff away from the stuff more interesting stuff (routes in particular)
+
+DONE
+DONE: Repo to build (using Docker) the jar file, having installed IBM Java, so that it can be deployed without maven and a lot of in-situ build process.
+DONE: another repo - Develop terraform (possibly related to above) to deploy artefacts
+DONE: Provide terraform for creation of IAM role, with minimum specific capabilities for SQS
 
 
 VARS required:

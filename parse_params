@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LIST="AWS_CRED CAMEL_VALUES"
+LIST="CAMEL_VALUES"
 # Before we get started, just check we have all the vars we need
 for var in $LIST; do
 	if [ "${!var}" == "" ] ; then

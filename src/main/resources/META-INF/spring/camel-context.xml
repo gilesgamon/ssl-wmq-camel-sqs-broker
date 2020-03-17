@@ -62,24 +62,12 @@
             </list>
         </property>
     </bean>
-    <bean id="sqsClient" class="com.amazonaws.services.sqs.AmazonSQSClient">
-        <constructor-arg>
-            <bean class="com.amazonaws.auth.BasicAWSCredentials">
-                <constructor-arg value="${access.key}" />
-                <constructor-arg value="${secret.key}" />
-            </bean>
-        </constructor-arg>
-        <property name="region" ref="awsRegion" />
-    </bean>
 
     <camelContext id="sqsToMq" xmlns="http://camel.apache.org/schema/spring">
         <propertyPlaceholder id="properties" location="classpath:/broker.properties" />
         <route id="sqsToMq">
-            <from uri="aws-sqs://mq_request?amazonSQSClient=#sqsClient&amp;concurrentConsumers=5&amp;greedy=true" />
-            <to uri="ibmMQ:{{ibm.requestqueue}}" />
-<!--             <log message="From SQS to MQ ${body} ${date:now:MMDDyy-HHmmss}" />
-            <to uri="log:like-to-see-all?level=INFO&amp;showAll=true&amp;multiline=true" />
- -->        </route>
+            <from uri="aws-sqs://mq_request?concurrentConsumers=5&amp;greedy=true" />
+        </route>
         <route id="mqToMq">
             <from uri="ibmMQ:{{ibm.requestqueue}}" />
             <log message="From MQ to MQ ${body} ${date:now:MMDDyy-HHmmss}" />
@@ -88,9 +76,7 @@
         <route id="mqToSqs">
             <from uri="ibmMQ:{{ibm.responsequeue}}" />
             <removeHeaders pattern="*" excludePattern="breadcrumbId|CamelAwsSqsMessageId|JMSCorrelationID|JMSCorrelationIDAsBytes|JMSMessageID|JMSReplyTo" />
-            <to uri="aws-sqs://mq_reply?amazonSQSClient=#sqsClient" />
-<!--             <log message="From MQ to SQS ${body} ${date:now:MMDDyy-HHmmss}" />
-            <to uri="log:like-to-see-all?level=INFO&amp;showAll=true&amp;multiline=true" />
- -->        </route>
+            <to uri="aws-sqs://mq_reply" />
+        </route>
     </camelContext>
 </beans>
