@@ -11,3 +11,5 @@ package-lock.json
 safe
 secrets
 target
+.terraform
+terraform.tfstate

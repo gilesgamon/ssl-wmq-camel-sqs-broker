@@ -67,10 +67,11 @@
         <propertyPlaceholder id="properties" location="classpath:/broker.properties" />
         <route id="sqsToMq">
             <from uri="aws-sqs://mq_request?concurrentConsumers=5&amp;greedy=true" />
+            <log message="From SQS to MQ ${body} ${date:now:MMDDyy-HHmmss}" />
+            <to uri="ibmMQ:{{ibm.requestqueue}}" />
         </route>
         <route id="mqToMq">
             <from uri="ibmMQ:{{ibm.requestqueue}}" />
-            <log message="From MQ to MQ ${body} ${date:now:MMDDyy-HHmmss}" />
             <to uri="ibmMQ:{{ibm.responsequeue}}?preserveMessageQos=true" />
         </route>
         <route id="mqToSqs">
