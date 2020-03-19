@@ -76,7 +76,7 @@
     <camelContext id="sqsToMq" xmlns="http://camel.apache.org/schema/spring">
         <!-- <propertyPlaceholder id="properties" location="classpath:/broker.properties" /> -->
         <route id="sqsToMq">
-            <from uri="aws-sqs://mq_request??amazonSQSClient=#sqsClient&amp;concurrentConsumers=5&amp;greedy=true" />
+            <from uri="aws-sqs://mq_request?amazonSQSClient=#sqsClient&amp;concurrentConsumers=5&amp;greedy=true" />
             <log message="From SQS to MQ ${body} ${date:now:MMDDyy-HHmmss}" />
             <to uri="ibmMQ:DEV.QUEUE.1" />
             <!-- <to uri="ibmMQ:{{ibm.requestqueue}}" /> -->
@@ -89,7 +89,7 @@
         <route id="mqToSqs">
             <from uri="ibmMQ:DEV.QUEUE.2" />
             <removeHeaders pattern="*" excludePattern="breadcrumbId|CamelAwsSqsMessageId|JMSCorrelationID|JMSCorrelationIDAsBytes|JMSMessageID|JMSReplyTo" />
-            <to uri="aws-sqs://mq_reply??amazonSQSClient=#sqsClient" />
+            <to uri="aws-sqs://mq_reply?amazonSQSClient=#sqsClient" />
         </route>
     </camelContext>
 </beans>
