@@ -24,4 +24,5 @@ docker build . -f Dockerfile_camel_router_runtime -t camel_router_runtime
 # terraform init
 # terraform apply
 docker tag camel_router_runtime:latest 272154369820.dkr.ecr.eu-west-1.amazonaws.com/camel-broker:latest
+`aws ecr get-login --no-include-email`
 docker push 272154369820.dkr.ecr.eu-west-1.amazonaws.com/camel-broker:latest

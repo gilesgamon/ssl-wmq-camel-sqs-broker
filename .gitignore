@@ -5,6 +5,8 @@
 *jks
 *pem
 *tgz
+*jar
+*backup
 artefacts
 node_modules
 package-lock.json

@@ -12,5 +12,4 @@ ADD ibm_java_install_response_file /tmp
 RUN /tmp/ibm-java-x86_64-sdk-8.0-6.6.bin -i silent -f /tmp/ibm_java_install_response_file
 ENV JAVA_HOME=/opt/ibm/java-x86_64-80
 ENV PATH=$JAVA_HOME/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
-RUN yum install -y maven
 RUN rm -f /tmp/ibm-java-x86_64-sdk-8.0-6.6.bin /tmp/ibm_java_install_response_file

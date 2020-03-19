@@ -1,7 +1,7 @@
 FROM ibm_java
 MAINTAINER Giles Gamon "giles@lsiarchi.consulting"
 
-RUN yum install -y openssl
+RUN yum install -y openssl maven
 
 ADD safe /tmp/safe
 RUN cd /root && git clone https://github.com/gilesgamon/ssl-wmq-camel-sqs-broker.git

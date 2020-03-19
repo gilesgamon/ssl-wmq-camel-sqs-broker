@@ -5,6 +5,7 @@ resource "aws_cloudwatch_log_group" "camel-broker" {
 
 resource "aws_ecs_task_definition" "camel-broker" {
   family = "camel-broker"
+  task_role_arn = aws_iam_role.camel_ecs_sqs_role.arn
 
   container_definitions = <<EOF
 [
