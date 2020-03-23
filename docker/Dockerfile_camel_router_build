@@ -3,9 +3,9 @@ MAINTAINER Giles Gamon "giles@lsiarchi.consulting"
 
 RUN yum install -y openssl maven
 
-ADD safe /tmp/safe
-RUN cd /root && git clone https://github.com/gilesgamon/ssl-wmq-camel-sqs-broker.git
-RUN cp /tmp/safe/caCert.pem /etc/pki/ca-trust/source/anchors/
+ADD . /root/ssl-wmq-camel-sqs-broker
+#RUN cd /root && git clone https://github.com/gilesgamon/ssl-wmq-camel-sqs-broker.git
+RUN cp /root/ssl-wmq-camel-sqs-broker/docker/safe/caCert.pem /etc/pki/ca-trust/source/anchors/
 RUN update-ca-trust
-RUN cd /tmp/safe && source ./secrets && cd /root/ssl-wmq-camel-sqs-broker && ./parse_params && mvn clean install && cp target/*jar /tmp && cp src/main/resources/server-chain.jks /tmp
-RUN rm -rf /tmp/safe
+RUN cd /root/ssl-wmq-camel-sqs-broker/docker/safe && source ./secrets && cd /root/ssl-wmq-camel-sqs-broker && ./parse_params && mvn clean install && cp target/*jar /tmp && cp src/main/resources/server-chain.jks /tmp
+RUN rm -rf /root/ssl-wmq-camel-sqs-broker/docker/safe

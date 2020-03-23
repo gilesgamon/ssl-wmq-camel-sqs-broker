@@ -17,12 +17,13 @@ if [ $AWS_CONTAINER_CREDENTIALS_RELATIVE_URI ] ; then
 	export AWS_CREDS=`cat /tmp/creds`
 	export AccessKeyId=`node -pe 'JSON.parse(process.env.AWS_CREDS).AccessKeyId'`
 	export SecretAccessKey=`node -pe 'JSON.parse(process.env.AWS_CREDS).SecretAccessKey'`
-	export Token=`node -pe 'JSON.parse(process.env.AWS_CREDS).Token'`
+	export SessionToken=`node -pe 'JSON.parse(process.env.AWS_CREDS).Token'`
 
-sleep 3600
-
-	java -DawsAccessKey=${AccessKeyId} -DawsSecretKey=${SecretAccessKey} -DsessionToken=${Token} -jar broker-1.0-SNAPSHOT.jar
+	if [ ! $SUDO_USER ] ; then
+		# Debugging - hold off starting inside true ECS task
+		sleep 3600
+	fi
+	java -Daws.AccessKeyId=${AccessKeyId} -Daws.SecretAccessKey=${SecretAccessKey} -Daws.SessionToken=${SessionToken} -jar broker-1.0-SNAPSHOT.jar
 else
 	echo "sleeping ... 'cos I don't have AWS_CONTAINER_CREDENTIALS_RELATIVE_URI set - diagnostic help"
-	sleep 3600
 fi

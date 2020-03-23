@@ -20,6 +20,7 @@
         <property name="keystoreType" value="${ssl.key-store-type}" />
         <property name="truststoreProvider" value="${ssl.key-store-provider}" />
         <property name="truststore" value="${ssl.truststore}" />
+        <property name="truststorePassword" value="${ssl.truststore.password.secure}" />
         <property name="certAlias" value="${ibm.certAlias}" />
         <property name="CipherSuite" value="${ibm.ciphersuite}" />
         <property name="protocols" value="${ibm.protocols}" />
@@ -38,9 +39,9 @@
     <bean id="sqsClient" class="com.amazonaws.services.sqs.AmazonSQSClient">
         <constructor-arg>
             <bean class="com.amazonaws.auth.BasicSessionCredentials">
-                <constructor-arg value="{{awsAccessKey}}" />
-                <constructor-arg value="{{awsSecretKey}}" />
-                <constructor-arg value="{{sessionToken}}" />
+                <constructor-arg value="{{aws.AccessKeyId}}" />
+                <constructor-arg value="{{aws.SecretAccessKey}}" />
+                <constructor-arg value="{{aws.SessionToken}}" />
             </bean>
         </constructor-arg>
         <property name="region" ref="awsRegion" />
@@ -76,6 +77,7 @@
     <camelContext id="sqsToMq" xmlns="http://camel.apache.org/schema/spring">
         <propertyPlaceholder id="properties" location="classpath:/broker.properties" />
         <route id="sqsToMq">
+            <!-- <from uri="aws-sqs://mq_request?concurrentConsumers=5&amp;greedy=true" /> -->
             <from uri="aws-sqs://mq_request?amazonSQSClient=#sqsClient&amp;concurrentConsumers=5&amp;greedy=true" />
             <log message="From SQS to MQ ${body} ${date:now:MMDDyy-HHmmss}" />
             <to uri="ibmMQ:{{ibm.requestqueue}}" />
@@ -87,6 +89,7 @@
         <route id="mqToSqs">
             <from uri="ibmMQ:{{ibm.responsequeue}}?preserveMessageQos=true" />
             <removeHeaders pattern="*" excludePattern="breadcrumbId|CamelAwsSqsMessageId|JMSCorrelationID|JMSCorrelationIDAsBytes|JMSMessageID|JMSReplyTo" />
+            <!-- <to uri="aws-sqs://mq_reply" /> -->
             <to uri="aws-sqs://mq_reply?amazonSQSClient=#sqsClient" />
         </route>
     </camelContext>

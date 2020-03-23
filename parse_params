@@ -1,5 +1,6 @@
 #!/bin/bash
 
+cp -f docker/safe/broker.properties src/main/resources
 LIST="CAMEL_VALUES"
 # Before we get started, just check we have all the vars we need
 for var in $LIST; do
@@ -8,10 +9,6 @@ for var in $LIST; do
 		exit 1
 	fi
 done
-# Backup out properties file
-if [ -z /tmp/broker.properties ] ; then
-	cp -n src/main/resources/broker.properties /tmp/broker.properties
-fi
 chmod +x jks_generate
 cd node
 npm i

@@ -2,7 +2,7 @@
 
 docker build . -f Dockerfile_aws_node12 -t node12
 docker build . -f Dockerfile_ibm_java -t ibm_java
-docker build . -f Dockerfile_camel_router_build -t camel_router_build
+docker build ~/ssl-wmq-camel-sqs-broker -f Dockerfile_camel_router_build -t camel_router_build
 docker create --name tempCamel camel_router_build
 mkdir -p ../artefacts
 docker cp tempCamel:/tmp/server-chain.jks .
