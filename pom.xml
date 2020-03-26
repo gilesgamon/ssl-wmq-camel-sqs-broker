@@ -16,11 +16,33 @@
         <ibmmq-version>9.1.4.0</ibmmq-version>
         <javax-version>2.0.1</javax-version>
         <activemq-camel-version>5.15.11</activemq-camel-version>
-        <aws-version>2.25.0</aws-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <camel-aws-version>2.25.0</camel-aws-version>
+        <aws-sdk-version>1.11.747</aws-sdk-version>
     </properties>
     <dependencies>
+        <!-- API, java.xml.bind module : required for later versions of Java (like v11)-->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>2.3.2</version>
+        </dependency>
+        <!-- Runtime, com.sun.xml.bind module : required for later versions of Java (like v11)-->
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>2.3.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-core</artifactId>
+            <version>${aws-sdk-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.amazonaws</groupId>
+            <artifactId>aws-java-sdk-sqs</artifactId>
+            <version>${aws-sdk-version}</version>
+        </dependency>
         <dependency>
             <groupId>javax.jms</groupId>
             <artifactId>javax.jms-api</artifactId>

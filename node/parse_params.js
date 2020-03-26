@@ -1,9 +1,7 @@
 const replace = require('replace-in-file');
 const FileLocation = '../src/main/resources/broker.properties'
 
-// var aws_cred = ["ACCESS_KEY", "SECRET_KEY"]
-var camel_options = ["QUEUE_MANAGER", "MQ_HOSTNAME", "MQ_PORT", "MQ_CHANNEL", "MQ_REQUEST_QUEUE", "MQ_RESPONSE_QUEUE", "MQ_CIPHER"]
-// var required_env_params = ["AWS_CRED", "CAMEL_VALUES", "CLIENT_KEY", "CLIENT_CRT", "ROOT_PEM", "INTERMEDIATE_PEM"]
+var camel_options = ["QUEUE_MANAGER", "MQ_HOSTNAME", "MQ_PORT", "MQ_CHANNEL", "MQ_REQUEST_QUEUE", "MQ_RESPONSE_QUEUE", "MQ_CIPHER", "SQS_REQUEST_QUEUE_NAME", "SQS_RESPONSE_QUEUE_NAME", "SQS_REGION"]
 var required_env_params = ["CAMEL_VALUES", "CLIENT_KEY", "CLIENT_CRT", "ROOT_PEM", "INTERMEDIATE_PEM"]
 
 function checkEnv (env_name) {
@@ -23,7 +21,6 @@ function prepare(event, context, options = null) {
 	}
 
     // load the Env settings
-    var aws_values = JSON.parse(process.env.AWS_CRED)
     var camel_values = JSON.parse(process.env.CAMEL_VALUES)
 
     var client_key = process.env.CLIENT_KEY
@@ -32,14 +29,6 @@ function prepare(event, context, options = null) {
     var intermediate_pem = process.env.INTERMEDIATE_PEM
     var options = { files: FileLocation }
 
-    // now check the internal values are complete
-    // for (var index = 0; index < aws_cred.length; index++) {
-    //     if (!aws_values[aws_cred[index]]) {
-    //         console.log(`Error accessing Env ${aws_cred[index]}`)
-    //         process.exit(1)
-    //     }
-    // }
-
     for (index = 0; index < camel_options.length; index++) {
         if (!camel_values[camel_options[index]]) {
             console.log(`Error accessing Env ${camel_options[index]}`)
@@ -47,17 +36,6 @@ function prepare(event, context, options = null) {
         }
     }
 
-    // do substitution for AWS_CREDS
-    // for (var index = 0; index < aws_cred.length; index++) {
-    //     options.from = aws_cred[index]
-    //     options.to = aws_values[aws_cred[index]]
-    //     try {
-    //         const results = replace.sync(options);
-    //         console.log(`Replacement of ${options.from} results:`, results);
-    //     } catch (error) {
-    //         console.error('Error occurred:', error);
-    //     }
-    // }
     // do substitution for CAMEL_OPTIONS
     for (var index = 0; index < camel_options.length; index++) {
         options.from = camel_options[index]
@@ -93,9 +71,6 @@ function pem_joiner (mucky_pem, gaps) {
 			new_lines.push(lines[dex])
 		}
 	}
-	// for ( dex = 0; dex < new_lines.length ; dex++) {
-	// 	console.log(`${dex}:${new_lines[dex]}`)
-	// }
 	var temp = []
 	lines = new_lines
 	var top_of_header = gaps + 1

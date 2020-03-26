@@ -7,6 +7,8 @@
 *tgz
 *jar
 *backup
+*key
+*crt
 artefacts
 node_modules
 package-lock.json
@@ -14,4 +16,5 @@ safe
 secrets
 target
 .terraform
+*lock.info
 terraform.tfstate

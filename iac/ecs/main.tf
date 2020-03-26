@@ -1,5 +1,5 @@
 provider "aws" {
-  region = "eu-west-1"
+  region = var.region
 }
 
 locals {
@@ -24,29 +24,15 @@ module "ec2-profile" {
 #----- ECS  Services--------
 
 module "camel-broker" {
-  source     = "./service-camel-broker"
+  source     = "./ecs-service"
+  name       = local.name
   cluster_id = module.ecs.this_ecs_cluster_id
+  image      = "272154369820.dkr.ecr.eu-west-1.amazonaws.com/camel-broker:latest"
+  region     = var.region
 }
 
 #----- ECS  Resources--------
 
-#For now we only use the AWS ECS optimized ami <https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html>
-
-data "aws_ami" "amazon_linux_ecs" {
-  most_recent = true
-
-  owners = ["amazon"]
-
-  filter {
-    name   = "name"
-    values = ["amzn-ami-*-amazon-ecs-optimized"]
-  }
-
-  filter {
-    name   = "owner-alias"
-    values = ["amazon"]
-  }
-}
 
 data "aws_subnet_ids" "gifted_vpc" {
   vpc_id = var.vpc_id

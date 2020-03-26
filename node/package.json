@@ -15,7 +15,6 @@
     "replace-in-file": "^5.0.2",
     "request-promise": "^4.2.5"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "description": "Just to neatly parse the config, which was proving a bit too complex to do with bash"
 }

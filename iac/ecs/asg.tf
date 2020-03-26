@@ -8,7 +8,7 @@ module "camel-broker-asg" {
   launch_configuration = aws_launch_configuration.docker_instance.name
   create_lc = false
 
-  image_id             = data.aws_ami.amazon_linux_ecs.id
+  image_id             = data.aws_ami.aws_optimized_ecs.id
   instance_type        = "t2.micro"
   security_groups      = data.aws_security_groups.gifted_sgs.ids
 

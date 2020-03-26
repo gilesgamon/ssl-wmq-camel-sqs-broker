@@ -4,7 +4,7 @@ made doing the SSL easy.
 
 Usage:
 
-WIP but - in principle load some vars (see below) and run './parse_params' and assuming you got that working correctly 'cd docker ; ./build.sh', should deliver back an executable (fat) jar and a server-chain.jks. Terraform to follow.
+WIP but - in principle load some vars (see below) & aws session/credentials loaded and run './parse_params' and assuming you got that working correctly 'cd docker ; ./build.sh', should deliver back an executable (fat) jar and a server-chain.jks. Terraform to follow.
 
 Now you should have a jar in target and a server-chain.jks in an artefacts directory - copy these to another machine (if required), which has IBM Java installed and use the startup scipts to run it.
 
@@ -23,24 +23,24 @@ Remove the MQ-MQ route in camel-context.xml and rebuild the jar
 
 TODO List
 
-Tidy paramater handling (json perhaps)
-Extend the number of parameters configured through said json (for example SQS queue names, performance parameters)
+Tidy paramater handling (json perhaps) & error checking in scripts
+Extend the number of parameters configured through said json (for example performance parameters)
 Test implementation & auto remove of the MQ-MQ loopback route
+Add optional self deploying MQ docker instance
 Paramatise / for-loop setup for routes: allow extensible number of router
 Tidy the server-chain.jks, which ought to be fully embedded / or fully externailsed from jar
 Some version tagging and paramtisation through the code
 Restructure some components (xml in particular) to out the stuff that is version list / plumbing stuff away from the stuff more interesting stuff (routes in particular)
+Clean up of ECR
+Deployment of MQ Docker setup
+There's some opportunity to streamline some of the terraform stuff
 
-DONE
 DONE: Repo to build (using Docker) the jar file, having installed IBM Java, so that it can be deployed without maven and a lot of in-situ build process.
 DONE: another repo - Develop terraform (possibly related to above) to deploy artefacts
 DONE: Provide terraform for creation of IAM role, with minimum specific capabilities for SQS
 
 
 VARS required:
-
-export ACCESS_KEY=''
-export SECRET_KEY=''
 
 // Just the raw PEM text : had to write a small (messy) handler to tidy this up
 export CLIENT_KEY=''
@@ -49,4 +49,4 @@ export ROOT_PEM=''
 export INTERMEDIATE_PEM=''
 
 export AWS_CRED='{ "ACCESS_KEY": "some_key", "SECRET_KEY": "some_secret" }'
-export CAMEL_VALUES='{ "QUEUE_MANAGER": "QM1", "MQ_HOSTNAME": "some_host_name", "MQ_PORT": "1414", "MQ_CHANNEL": "DEV.APP.SVRCONN", "MQ_CIPHER": "SSL_ECDHE_RSA_WITH_AES_256_CBC_SHA384", "MQ_REQUEST_QUEUE": "DEV.QUEUE.1", "MQ_RESPONSE_QUEUE": "DEV.QUEUE.2"}'
+export CAMEL_VALUES='{ "QUEUE_MANAGER": "QM1", "MQ_HOSTNAME": "some_host_name", "MQ_PORT": "1414", "MQ_CHANNEL": "DEV.APP.SVRCONN", "MQ_CIPHER": "SSL_ECDHE_RSA_WITH_AES_256_CBC_SHA384", "MQ_REQUEST_QUEUE": "DEV.QUEUE.1", "MQ_RESPONSE_QUEUE": "DEV.QUEUE.2", "SQS_REQUEST_QUEUE_NAME": "sqs_request_1", "SQS_RESPONSE_QUEUE_NAME": "sqs_response_1", "SQS_REGION": "eu-west-1"}'

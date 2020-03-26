@@ -1,7 +1,7 @@
 ## IAM Role Policy that allows access to SQS from ECS task (docker instance)
-resource "aws_iam_role_policy" "camel_ecs_sqs" {
-  name = "camel_ecs_sqs"
-  role = aws_iam_role.camel_ecs_sqs_role.id
+resource "aws_iam_role_policy" "this" {
+  name = "${var.name}-service"
+  role = aws_iam_role.this.id
 
   lifecycle {
     create_before_destroy = true
@@ -9,8 +9,8 @@ resource "aws_iam_role_policy" "camel_ecs_sqs" {
   policy = file("policies/task_policy.json")
 }
 
-resource "aws_iam_role" "camel_ecs_sqs_role" {
-  name = "camel_ecs_sqs_role"
+resource "aws_iam_role" "this" {
+  name = "${var.name}_role"
 
   assume_role_policy = file("policies/task_trust.json")
   }

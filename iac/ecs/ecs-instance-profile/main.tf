@@ -2,20 +2,7 @@ resource "aws_iam_role" "this" {
   name = "${var.name}_ecs_instance_role"
   path = "/ecs/"
 
-  assume_role_policy = <<EOF
-{
-  "Version": "2008-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": ["ec2.amazonaws.com"]
-      },
-      "Effect": "Allow"
-    }
-  ]
-}
-EOF
+  assume_role_policy = file("policies/ecs_trust_policy.json")
 }
 
 resource "aws_iam_instance_profile" "this" {
