@@ -12,26 +12,34 @@
         <maven-shade-version>3.2.2</maven-shade-version>
         <spring-version>5.2.4.RELEASE</spring-version>
         <camel-version>2.24.1</camel-version>
+        <camel-velocity-version>2.25.0</camel-velocity-version>
+        <camel-support-version>3.0.1</camel-support-version>
+        <camel-aws-version>2.25.0</camel-aws-version>
         <slf4j-version>1.7.30</slf4j-version>
         <ibmmq-version>9.1.4.0</ibmmq-version>
         <javax-version>2.0.1</javax-version>
         <activemq-camel-version>5.15.11</activemq-camel-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <camel-aws-version>2.25.0</camel-aws-version>
         <aws-sdk-version>1.11.747</aws-sdk-version>
+        <jakarta-xml-bind-api>2.3.2</jakarta-xml-bind-api>
     </properties>
     <dependencies>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-velocity</artifactId>
+            <version>${camel-velocity-version}</version>
+        </dependency>
         <!-- API, java.xml.bind module : required for later versions of Java (like v11)-->
         <dependency>
             <groupId>jakarta.xml.bind</groupId>
             <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>2.3.2</version>
+            <version>${jakarta-xml-bind-api}</version>
         </dependency>
         <!-- Runtime, com.sun.xml.bind module : required for later versions of Java (like v11)-->
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
-            <version>2.3.2</version>
+            <version>${jakarta-xml-bind-api}</version>
         </dependency>
         <dependency>
             <groupId>com.amazonaws</groupId>

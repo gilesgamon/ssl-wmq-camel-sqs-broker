@@ -1,18 +1,21 @@
 FROM ibm_java
 MAINTAINER Giles Gamon "giles@lsiarchi.consulting"
 
+RUN yum update -y
 # Install Camel fat jar & dependencies
 RUN mkdir /opt/camel-broker
 ADD server-chain.jks /opt/camel-broker/server-chain.jks
+ADD client.jks /opt/camel-broker/client.jks
 ADD broker-1.0-SNAPSHOT.jar /opt/camel-broker/broker-1.0-SNAPSHOT.jar
 WORKDIR /opt/camel-broker
 
 # Install AWS CloudWatch Agent
-RUN cd /tmp && wget https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm && rpm -U ./amazon-cloudwatch-agent.rpm && mkdir -p /opt/aws/amazon-cloudwatch-agent/etc/ /opt/aws/amazon-cloudwatch-agent/logs/
+RUN cd /tmp && wget -q https://s3.amazonaws.com/amazoncloudwatch-agent/amazon_linux/amd64/latest/amazon-cloudwatch-agent.rpm && rpm -U ./amazon-cloudwatch-agent.rpm && mkdir -p /opt/aws/amazon-cloudwatch-agent/etc/ /opt/aws/amazon-cloudwatch-agent/logs/
 ADD amazon-cloudwatch-agent.json /opt/aws/amazon-cloudwatch-agent/etc/
 RUN rm /tmp/amazon-cloudwatch-agent.rpm
 
 # Startup
+RUN mkdir -p /opt/camel-broker
 ADD start_script.sh /opt/camel-broker
 RUN chmod +x /opt/camel-broker/start_script.sh
 ENTRYPOINT ["/opt/camel-broker/start_script.sh"]

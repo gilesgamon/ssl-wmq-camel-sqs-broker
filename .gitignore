@@ -9,6 +9,8 @@
 *backup
 *key
 *crt
+*zip
+*p12
 artefacts
 node_modules
 package-lock.json

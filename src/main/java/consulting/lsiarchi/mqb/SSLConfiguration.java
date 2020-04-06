@@ -15,8 +15,8 @@ public class SSLConfiguration {
 
   private String keystore = null;
   private String keystorePassword = "";
-  private String keystoreProvider = "SUN";
-  private String truststoreProvider = "SUN";
+  private String keystoreProvider = "IBMJCE";
+  private String truststoreProvider = "IBMJCE";
   private String truststore = null;
   private String keystoreType = "";
   private String truststorePassword = "";
@@ -24,12 +24,12 @@ public class SSLConfiguration {
   private String useIBMCipherMappings = "false";
   private String cipherSuite;
   private String protocols = "TLSv1.2";
+
   private SSLSocketFactory SSLSocketFactory = null;
 
-  public SSLSocketFactory createSSLSocketFactory(String keyStorePath, String trustStorePath, char[] keystorePassword, char[] truststorePassword, char[] keyManagerPassword)
+    public SSLSocketFactory createSSLSocketFactory(String keyStorePath, String trustStorePath, char[] keystorePassword, char[] truststorePassword, char[] keyManagerPassword)
       throws Exception {
 
-    System.out.println("createSSLSocketFactory");
     KeyManagerFactory keyManagerFactory = null;
     if (keyStorePath != null) {
 
@@ -82,93 +82,77 @@ public class SSLConfiguration {
   }
 
   public String getKeystore() {
-    System.out.println("getKeystore");
     return keystore;
   }
 
   public void setKeystore(String keystore) {
-    System.out.println("setKeystore");
-    System.setProperty("javax.net.ssl.keyStore",keystore);
+    System.setProperty("javax.net.ssl.keyStore", keystore);
     this.keystore = keystore;
   }
 
   public void setKeystoreProvider(String keystoreProvider) {
-    System.out.println("setKeystoreProvider");
-    System.setProperty("javax.net.ssl.keyStoreProvider",keystoreProvider);
+    System.setProperty("javax.net.ssl.keyStoreProvider", keystoreProvider);
     this.keystoreProvider = keystoreProvider;
   }
 
   public void setTruststoreProvider(String truststoreProvider) {
-    System.out.println("setTruststoreProvider");
     System.setProperty("javax.net.ssl.trustStoreProvider",truststoreProvider);
     this.truststoreProvider = truststoreProvider;
   }
 
   public void setcertAlias(String certAlias) {
-    System.out.println("setcertAlias");
     System.setProperty("javax.net.ssl.certAlias",certAlias);
     this.certAlias = certAlias;
   }
 
   public void setuseIBMCipherMappings(String useIBMCipherMappings) {
-    System.out.println("setuseIBMCipherMappings");
     System.setProperty("com.ibm.mq.cfg.useIBMCipherMappings", useIBMCipherMappings);
     this.useIBMCipherMappings = useIBMCipherMappings;
   }
 
   public String getTruststore() {
-    System.out.println("getTruststore");
     return truststore;
   }
 
   public void setprotocols(String protocols) {
-    System.out.println("setprotocols");
     System.setProperty("jdk.tls.client.protocols", protocols);
     this.protocols = protocols;
   }
   public void setCipherSuite(String cipherSuite) {
-    System.out.println("setCipherSuite");
     System.setProperty("jdk.tls.client.cipherSuites", cipherSuite);
     System.setProperty("jdk.tls.server.cipherSuites", cipherSuite);
     this.cipherSuite = cipherSuite;
   }
 
   public void setTruststore(String truststore) {
-    System.out.println("setTruststore");
     System.setProperty("javax.net.ssl.trustStore", truststore);
     this.truststore = truststore;
   }
 
   public void setkeystoreType(String keystoreType) {
-    System.out.println("setkeystoreType");
     System.setProperty("javax.net.ssl.keystoreType", keystoreType);
     this.keystoreType = keystoreType;
   }
 
   public String getTruststorePassword() {
-    System.out.println("getTruststorePassword");
     return truststorePassword;
   }
 
   public void setTruststorePassword(String truststorePassword) {
-    System.out.println("setTruststorePassword");
     System.setProperty("javax.net.ssl.trustStorePassword", truststorePassword);
     this.truststorePassword = truststorePassword;
   }
 
   public String getKeystorePassword() {
-    System.out.println("getKeystorePassword");
     return keystorePassword;
   }
 
   public void setKeystorePassword(String keystorePassword) {
-    System.out.println("setKeystorePassword");
-    System.setProperty("javax.net.ssl.keyStorePassword",keystorePassword);
+    System.setProperty("javax.net.ssl.keyStorePassword", keystorePassword);
     this.keystorePassword = keystorePassword;
   }
 
   public SSLSocketFactory getSSLSocketFactory() throws Exception {
-    System.out.println("getSSLSocketFactory");
     if (SSLSocketFactory == null) {
       SSLSocketFactory = createSSLSocketFactory(keystore, truststore, keystorePassword.toCharArray(), truststorePassword.toCharArray(), keystorePassword.toCharArray());
     }
@@ -178,5 +162,4 @@ public class SSLConfiguration {
   public void setSSLSocketFactory(SSLSocketFactory sSLSocketFactory) {
     SSLSocketFactory = sSLSocketFactory;
   }
-
 }

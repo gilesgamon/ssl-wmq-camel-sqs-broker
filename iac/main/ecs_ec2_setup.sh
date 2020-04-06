@@ -1,3 +1,5 @@
+# Just to help debugging of ECS/Task build
+
 yum -y update
 
 curl -sL https://rpm.nodesource.com/setup_12.x | bash -

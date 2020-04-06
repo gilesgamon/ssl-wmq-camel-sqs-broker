@@ -27,7 +27,7 @@ module "camel-broker" {
   source     = "./ecs-service"
   name       = local.name
   cluster_id = module.ecs.this_ecs_cluster_id
-  image      = "272154369820.dkr.ecr.eu-west-1.amazonaws.com/camel-broker:latest"
+  image      = "${var.account_id}.dkr.ecr.eu-west-1.amazonaws.com/camel-broker:latest"
   region     = var.region
 }
 

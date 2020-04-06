@@ -1,0 +1,36 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "logs:CreateLogStream",
+                "logs:CreateLogGroup",
+                "logs:PutLogEvents"
+            ],
+            "Effect": "Allow",
+            "Resource": "arn:aws:logs:eu-west-1:272154369820:*"
+        },
+        {
+            "Action": [
+                "dynamodb:*"
+            ],
+            "Effect": "Allow",
+            "Resource": "arn:aws:dynamodb:eu-west-1:272154369820:table/gg_mq_test"
+        },
+         {
+            "Action": [
+                "sqs:GetQueueAttributes",
+                "sqs:GetQueueUrl",
+                "sqs:SendMessage"
+            ],
+            "Effect": "Allow",
+            "Resource": "*"
+        },
+        {
+            "Sid": "AllowExecutionFromAPIGateway",
+            "Action": "lambda:InvokeFunction",
+            "Effect": "Allow",
+            "Resource": "*"
+        }
+    ]
+}

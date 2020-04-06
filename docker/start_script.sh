@@ -15,7 +15,7 @@ if [ $AWS_CONTAINER_CREDENTIALS_RELATIVE_URI ] ; then
 		# sleep 3600
 		echo "Go..."
 	fi
-	java -Daws.AccessKeyId=${AccessKeyId} -Daws.SecretAccessKey=${SecretAccessKey} -Daws.SessionToken=${SessionToken} -jar broker-1.0-SNAPSHOT.jar
+	java -Daws.AWS_ACCESS_KEY_ID=${AccessKeyId} -Daws.AWS_SECRET_ACCESS_KEY=${SecretAccessKey} -Daws.AWS_SESSION_TOKEN=${SessionToken} -jar broker-1.0-SNAPSHOT.jar
 else
 	echo "sleeping ... 'cos I don't have AWS_CONTAINER_CREDENTIALS_RELATIVE_URI set - diagnostic help"
 fi
