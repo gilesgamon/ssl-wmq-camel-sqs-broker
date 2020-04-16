@@ -1,7 +1,3 @@
-provider "aws" {
-  region = var.region
-}
-
 locals {
   name        = var.ecs_cluster_name
   environment = "dev"
@@ -32,7 +28,6 @@ module "camel-broker" {
 }
 
 #----- ECS  Resources--------
-
 
 data "aws_subnet_ids" "gifted_vpc" {
   vpc_id = var.vpc_id

@@ -1,4 +1,4 @@
-module "ecr-repository" {
+module "ecr-repository-camel-broker" {
   source = "./ecr-repo"
 
   repository_name = "camel-broker"

@@ -19,9 +19,9 @@ variable "region" {
   default = "eu-west-1"
 }
 
-#provider "aws" {
-  #region     = var.region
-#}
+provider "aws" {
+  region     = var.region
+}
 
 ########################### Autoscale Config ################################
 

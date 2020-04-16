@@ -4,10 +4,10 @@ cp `find /Library/Java/JavaVirtualMachines/jdk1.8.0_241.jdk /etc -name cacerts -
 echo "Adding intermediate certificate to server-chain.jks"
 keytool -import -file intermediate.pem -alias intermediate -trustcacerts -keystore server-chain.jks -storepass changeit -noprompt
 echo "Adding root certificate to server-chain.jks"
-keytool -import -file caCert.pem -alias root -trustcacerts -keystore server-chain.jks -storepass changeit -noprompt
+keytool -import -file ca.pem -alias root -trustcacerts -keystore server-chain.jks -storepass changeit -noprompt
 # echo "Adding mq_server certificate to server-chain.jks"
 # keytool -import -file mq_server.pem -alias mq_server -trustcacerts -keystore server-chain.jks -storepass changeit -noprompt
-openssl pkcs12 -export -in client.crt -inkey client.key -certfile client.crt -out clientKeyStore.p12 -passout pass:changeit
+openssl pkcs12 -export -in client.pem -inkey client.key -certfile client.pem -out clientKeyStore.p12 -passout pass:changeit
 echo "Adding user's private key to client.jks"
 keytool -importkeystore -srckeystore clientKeyStore.p12 -srcstoretype pkcs12 -destkeystore client.jks -deststoretype JKS -noprompt -storepass changeit -srcstorepass changeit
 keytool -changealias -keystore client.jks -alias 1 -destalias client -storepass changeit

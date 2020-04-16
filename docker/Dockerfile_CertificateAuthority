@@ -1,0 +1,43 @@
+FROM amazonlinux:2
+MAINTAINER Giles Gamon "giles@lsiarchi.consulting"
+
+RUN yum update -y
+RUN yum install -y openssl
+
+#Nice guuide here https://jamielinux.com/docs/openssl-certificate-authority/create-the-root-pair.html
+
+RUN mkdir -p /root/ca/intermediate
+ADD openssl.cnf /root/ca
+ADD intermediate_openssl.cnf /root/ca/intermediate/openssl.cnf
+
+# Create CA
+RUN cd /root/ca && mkdir certs crl newcerts private && chmod 700 private && touch index.txt && echo 1000 > serial
+RUN cd /root/ca && openssl genrsa -aes256 -passout pass:changeme -out private/ca.key.pem 4096 && chmod 400 private/ca.key.pem
+RUN cd /root/ca && openssl req -passin pass:changeme -subj "/C=UK/ST=England/O=LSI Archi Consulting Ltd/CN=LSI Archi Consulting Root CA" -key private/ca.key.pem -new -x509 -days 999 -sha256 -extensions v3_ca -out certs/ca.cert.pem && chmod 444 certs/ca.cert.pem
+RUN cd /root/ca/intermediate && mkdir certs crl csr newcerts private && chmod 700 private && touch index.txt && echo 1000 > serial && echo 1000 > /root/ca/intermediate/crlnumber
+
+# Create Intermediate CA
+RUN cd /root/ca && openssl genrsa -aes256 -passout pass:changeme -out intermediate/private/intermediate.key.pem 4096 && chmod 400 intermediate/private/intermediate.key.pem
+RUN cd /root/ca && openssl req -passin pass:changeme -subj "/C=UK/ST=England/O=LSI Archi Consulting Ltd/CN=LSI Archi Consulting Intermediate CA" -config intermediate/openssl.cnf -new -sha256 -key intermediate/private/intermediate.key.pem -out intermediate/csr/intermediate.csr.pem
+RUN cd /root/ca && openssl ca -passin pass:changeme -subj "/C=UK/ST=England/O=LSI Archi Consulting Ltd/CN=LSI Archi Consulting Intermediate CA" -config openssl.cnf -extensions v3_intermediate_ca -days 365 -notext -md sha256 -in intermediate/csr/intermediate.csr.pem -out intermediate/certs/intermediate.cert.pem -batch && chmod 444 intermediate/certs/intermediate.cert.pem
+
+# Create a certificate chain
+RUN cd /root/ca && cat intermediate/certs/intermediate.cert.pem certs/ca.cert.pem > intermediate/certs/ca-chain.cert.pem && chmod 444 intermediate/certs/ca-chain.cert.pem
+
+# Create & sign server cert
+RUN cd /root/ca && openssl genrsa -aes256 -passout pass:changeme -out intermediate/private/mqtls.lsiarchi.consulting.key.pem 2048 && chmod 400 intermediate/private/mqtls.lsiarchi.consulting.key.pem
+RUN cp /root/ca/intermediate/openssl.cnf /root/ca/intermediate/mqtls.cnf && printf "\n[SAN]\nsubjectAltName=DNS:mqtls.lsiarchi.consulting, DNS:localhost" >> /root/ca/intermediate/mqtls.cnf
+RUN cd /root/ca && openssl req -passin pass:changeme -subj "/C=UK/ST=England/O=LSI Archi Consulting Ltd/CN=mqtls.lsiarchi.consulting" -reqexts SAN -config /root/ca/intermediate/mqtls.cnf -key intermediate/private/mqtls.lsiarchi.consulting.key.pem -new -sha256 -out intermediate/csr/mqtls.lsiarchi.consulting.csr.pem
+RUN cd /root/ca && openssl ca -batch -passin pass:changeme -config intermediate/openssl.cnf -extensions server_cert -days 365 -notext -md sha256 -in intermediate/csr/mqtls.lsiarchi.consulting.csr.pem -out intermediate/certs/mqtls.lsiarchi.consulting.cert.pem && chmod 444 intermediate/certs/mqtls.lsiarchi.consulting.cert.pem
+
+# Create & sign user cert
+RUN cd /root/ca && openssl genrsa -aes256 -passout pass:changeme -out intermediate/private/mq_user.lsiarchi.consulting.key.pem 2048 && chmod 400 intermediate/private/mq_user.lsiarchi.consulting.key.pem
+RUN cd /root/ca && openssl req -passin pass:changeme -subj "/C=UK/ST=England/O=LSI Archi Consulting Ltd/CN=mq_user@lsiarchi.consulting" -config /root/ca/intermediate/openssl.cnf -key intermediate/private/mq_user.lsiarchi.consulting.key.pem -new -sha256 -out intermediate/csr/mq_user.lsiarchi.consulting.csr.pem
+RUN cd /root/ca && openssl ca -batch -passin pass:changeme -config intermediate/openssl.cnf -extensions server_cert -days 365 -notext -md sha256 -in intermediate/csr/mq_user.lsiarchi.consulting.csr.pem -out intermediate/certs/mq_user.lsiarchi.consulting.cert.pem && chmod 444 intermediate/certs/mq_user.lsiarchi.consulting.cert.pem
+
+# Remove encryption from keys
+RUN cd /root/ca && openssl rsa -passin pass:changeme -in intermediate/private/intermediate.key.pem -out intermediate/private/intermediate.key.pem
+RUN cd /root/ca && openssl rsa -passin pass:changeme -in intermediate/private/mqtls.lsiarchi.consulting.key.pem -out intermediate/private/mqtls.lsiarchi.consulting.key.pem
+RUN cd /root/ca && openssl rsa -passin pass:changeme -in intermediate/private/mq_user.lsiarchi.consulting.key.pem -out intermediate/private/mq_user.lsiarchi.consulting.key.pem
+
+

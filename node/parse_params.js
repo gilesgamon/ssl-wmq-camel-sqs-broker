@@ -2,7 +2,7 @@ const replace = require('replace-in-file');
 const FileLocation = '../src/main/resources/broker.properties'
 
 var camel_options = ["QUEUE_MANAGER", "MQ_HOSTNAME", "MQ_PORT", "MQ_CHANNEL", "MQ_REQUEST_QUEUE", "MQ_RESPONSE_QUEUE", "MQ_CIPHER", "SQS_REQUEST_QUEUE_NAME", "SQS_RESPONSE_QUEUE_NAME", "AWS_REGION"]
-var required_env_params = ["CAMEL_VALUES", "CLIENT_KEY", "CLIENT_CRT", "ROOT_PEM", "INTERMEDIATE_PEM"]
+var required_env_params = ["CAMEL_VALUES", "CLIENT_KEY", "CLIENT_PEM", "ROOT_PEM", "INTERMEDIATE_PEM"]
 
 function checkEnv (env_name) {
 	// crach out if we haven't been given correct env params
@@ -24,7 +24,7 @@ function prepare(event, context, options = null) {
     var camel_values = JSON.parse(process.env.CAMEL_VALUES)
 
     var client_key = process.env.CLIENT_KEY
-    var client_crt = process.env.CLIENT_CRT
+    var client_pem = process.env.CLIENT_PEM
     var root_pem = process.env.ROOT_PEM
     var intermediate_pem = process.env.INTERMEDIATE_PEM
     var options = { files: FileLocation }
@@ -50,8 +50,8 @@ function prepare(event, context, options = null) {
     }
 
     saveFileData(pem_joiner(client_key, 3), '../client.key')
-    saveFileData(pem_joiner(client_crt, 1), '../client.crt')
-    saveFileData(pem_joiner(root_pem, 1), '../caCert.pem')
+    saveFileData(pem_joiner(client_pem, 1), '../client.pem')
+    saveFileData(pem_joiner(root_pem, 1), '../ca.pem')
     saveFileData(pem_joiner(intermediate_pem, 1), '../intermediate.pem')
 }
 
