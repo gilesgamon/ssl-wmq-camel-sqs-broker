@@ -26,7 +26,7 @@ Remove the MQ-MQ route in camel-context.xml and rebuild the jar
 
 TODO List
 
-Provision DynamoDB with TF (including ttl, which is prep'd in teh data) & check I haven't missed any other key components
+Provision DynamoDB with TF (including ttl, which is prep'd in the data) & check I haven't missed any other key components
 Tidy paramater handling (json perhaps) & error checking in scripts
 Extend the number of parameters configured through said json (for example performance parameters)
 Test implementation & auto remove of the MQ-MQ loopback route
