@@ -1,7 +1,7 @@
 const replace = require('replace-in-file');
-const FileLocation = '../src/main/resources/broker.properties'
+const FileLocation = '../broker.properties'
 
-var camel_options = ["QUEUE_MANAGER", "MQ_HOSTNAME", "MQ_PORT", "MQ_CHANNEL", "MQ_REQUEST_QUEUE", "MQ_RESPONSE_QUEUE", "MQ_CIPHER", "SQS_REQUEST_QUEUE_NAME", "SQS_RESPONSE_QUEUE_NAME", "AWS_REGION"]
+var camel_options = ["QUEUE_MANAGER", "MQ_PORT", "MQ_CHANNEL", "MQ_REQUEST_QUEUE", "MQ_RESPONSE_QUEUE", "MQ_CIPHER", "SQS_REQUEST_QUEUE_NAME", "SQS_RESPONSE_QUEUE_NAME", "AWS_REGION"]
 var required_env_params = ["CAMEL_VALUES", "CLIENT_KEY", "CLIENT_PEM", "ROOT_PEM", "INTERMEDIATE_PEM"]
 
 function checkEnv (env_name) {

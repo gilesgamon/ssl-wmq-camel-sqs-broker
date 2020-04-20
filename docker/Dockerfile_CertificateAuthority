@@ -39,5 +39,3 @@ RUN cd /root/ca && openssl ca -batch -passin pass:changeme -config intermediate/
 RUN cd /root/ca && openssl rsa -passin pass:changeme -in intermediate/private/intermediate.key.pem -out intermediate/private/intermediate.key.pem
 RUN cd /root/ca && openssl rsa -passin pass:changeme -in intermediate/private/mqtls.lsiarchi.consulting.key.pem -out intermediate/private/mqtls.lsiarchi.consulting.key.pem
 RUN cd /root/ca && openssl rsa -passin pass:changeme -in intermediate/private/mq_user.lsiarchi.consulting.key.pem -out intermediate/private/mq_user.lsiarchi.consulting.key.pem
-
-

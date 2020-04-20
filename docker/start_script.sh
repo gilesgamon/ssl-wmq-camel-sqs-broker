@@ -10,6 +10,9 @@ if [ $AWS_CONTAINER_CREDENTIALS_RELATIVE_URI ] ; then
 	export SecretAccessKey=`node -pe 'JSON.parse(process.env.AWS_CREDS).SecretAccessKey'`
 	export SessionToken=`node -pe 'JSON.parse(process.env.AWS_CREDS).Token'`
 
+	export CLASSPATH=/opt/camel-broker
+	sed -i 's/MQ_HOSTNAME/$MQ_HOSTNAME/g' /opt/camel-broker/broker.properties
+
 	if [ ! $SUDO_USER ] ; then
 		# Debugging - hold off starting inside true ECS task
 		# sleep 3600
