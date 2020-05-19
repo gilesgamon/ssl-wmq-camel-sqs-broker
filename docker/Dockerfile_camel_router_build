@@ -7,5 +7,5 @@ ADD . /root/ssl-wmq-camel-sqs-broker
 #RUN cd /root && git clone https://github.com/gilesgamon/ssl-wmq-camel-sqs-broker.git
 RUN cp /root/ssl-wmq-camel-sqs-broker/docker/safe/ca.pem /etc/pki/ca-trust/source/anchors/
 RUN update-ca-trust
-RUN cd /root/ssl-wmq-camel-sqs-broker/docker/safe && source ./secrets && cd /root/ssl-wmq-camel-sqs-broker && ./parse_params && mvn clean install && cp target/*jar /tmp && cp src/main/resources/server-chain.jks /tmp  && cp src/main/resources/client.jks /tmp
+RUN cd /root/ssl-wmq-camel-sqs-broker/docker && source safe/secrets && cd /root/ssl-wmq-camel-sqs-broker && ./parse_params && mvn clean install && cp target/*jar /tmp && cp src/main/resources/server-chain.jks /tmp  && cp src/main/resources/client.jks /tmp
 RUN rm -rf /root/ssl-wmq-camel-sqs-broker/docker/safe

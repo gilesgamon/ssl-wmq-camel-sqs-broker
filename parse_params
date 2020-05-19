@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cp -f docker/safe/broker.properties src/main/resources
+cp -f docker/safe/broker.properties docker
 LIST="CAMEL_VALUES"
 # Before we get started, just check we have all the vars we need
 for var in $LIST; do
@@ -12,6 +12,21 @@ done
 chmod +x jks_generate
 cd node
 npm i
+retval=$?
+if [ $retval -ne 0 ]; then
+    echo "Return code was not zero but $retval"
+    exit 1
+fi
 node parse_params.js prepare
+retval=$?
+if [ $retval -ne 0 ]; then
+    echo "Return code was not zero but $retval"
+    exit 1
+fi
 cd ..
 ./jks_generate
+retval=$?
+if [ $retval -ne 0 ]; then
+    echo "Return code was not zero but $retval"
+    exit 1
+fi

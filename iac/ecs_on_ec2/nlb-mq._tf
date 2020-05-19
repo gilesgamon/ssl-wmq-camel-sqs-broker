@@ -1,0 +1,100 @@
+# ----- NLB (MQ Service) ----------
+resource "aws_lb" "mq" {
+  name               = "mq-lb-tf"
+  internal           = true
+  load_balancer_type = "network"
+  subnets            = data.aws_subnet_ids.gifted_vpc.ids
+
+  enable_deletion_protection = false
+}
+
+resource "aws_lb" "mq_admin" {
+  name               = "mq-admin-lb-tf"
+  internal           = false
+  load_balancer_type = "network"
+  subnets            = data.aws_subnet_ids.gifted_vpc.ids
+
+  enable_deletion_protection = false
+}
+
+resource "aws_lb_target_group" "mq" {
+  name     = "mq-lb-tf"
+  port     = 1414
+  protocol = "TCP"
+  vpc_id   = var.vpc_id
+
+#health_check {
+#    enabled = false
+#  }
+
+#  stickiness {
+#    enabled = false
+#    type = "lb_cookie"
+#  }
+  depends_on = [ aws_lb.mq ]
+}
+
+resource "aws_lb_listener" "ecs_mq" {
+  load_balancer_arn = aws_lb.mq.arn
+  port              = "1414"
+  protocol          = "TLS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate.mq_cert.arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.mq.arn
+  }
+}
+
+resource "aws_acm_certificate" "mq_cert" {
+  private_key      = file("../../docker/safe/mq_server.key")
+  certificate_body = file("../../docker/safe/mq_server.pem")
+  certificate_chain= file("../../docker/safe/ca-chain.pem")
+}
+
+resource "aws_lb_target_group" "mq_admin" {
+  name     = "mq-admin-lb-tf"
+  port     = 9443
+  protocol = "TCP"
+  vpc_id   = var.vpc_id
+
+  health_check {
+    port     = 9443
+    protocol = "HTTPS"
+    path     = "/ibmmq/console/login.html"
+    interval = 30
+  }
+
+#  stickiness {
+#    enabled = false
+#    type = "lb_cookie"
+#  }
+  depends_on = [ aws_lb.mq_admin ]
+}
+
+resource "aws_lb_listener" "ecs_mq_admin" {
+  load_balancer_arn = aws_lb.mq_admin.arn
+  port              = "9443"
+  protocol          = "TLS"
+  ssl_policy        = "ELBSecurityPolicy-2016-08"
+  certificate_arn   = aws_acm_certificate.mq_cert.arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.mq_admin.arn
+  }
+}
+
+# ------ DNS Alias to point at MQ NLB -----
+resource aws_route53_record "mq" {
+  zone_id = var.mq_zone_id
+  name    = "mq"
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.mq.dns_name
+    zone_id                = aws_lb.mq.zone_id
+    evaluate_target_health = true
+  }
+}

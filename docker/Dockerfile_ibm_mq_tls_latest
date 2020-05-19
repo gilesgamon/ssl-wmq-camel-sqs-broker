@@ -1,0 +1,14 @@
+FROM ibmcom/mq:latest
+MAINTAINER Giles Gamon "giles@lsiarchi.consulting"
+
+ADD mqm/mykey /etc/mqm/pki/keys/mykey
+ADD mqm/trust /etc/mqm/pki/trust
+
+ENV LICENSE=accept
+ENV MQ_QMGR_NAME=QM1
+
+EXPOSE 1414/tcp
+EXPOSE 9443/tcp
+
+#USER root
+#ENTRYPOINT [ ]

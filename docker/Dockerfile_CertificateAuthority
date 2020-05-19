@@ -25,10 +25,10 @@ RUN cd /root/ca && openssl ca -passin pass:changeme -subj "/C=UK/ST=England/O=LS
 RUN cd /root/ca && cat intermediate/certs/intermediate.cert.pem certs/ca.cert.pem > intermediate/certs/ca-chain.cert.pem && chmod 444 intermediate/certs/ca-chain.cert.pem
 
 # Create & sign server cert
-RUN cd /root/ca && openssl genrsa -aes256 -passout pass:changeme -out intermediate/private/mqtls.lsiarchi.consulting.key.pem 2048 && chmod 400 intermediate/private/mqtls.lsiarchi.consulting.key.pem
-RUN cp /root/ca/intermediate/openssl.cnf /root/ca/intermediate/mqtls.cnf && printf "\n[SAN]\nsubjectAltName=DNS:mqtls.lsiarchi.consulting, DNS:localhost" >> /root/ca/intermediate/mqtls.cnf
-RUN cd /root/ca && openssl req -passin pass:changeme -subj "/C=UK/ST=England/O=LSI Archi Consulting Ltd/CN=mqtls.lsiarchi.consulting" -reqexts SAN -config /root/ca/intermediate/mqtls.cnf -key intermediate/private/mqtls.lsiarchi.consulting.key.pem -new -sha256 -out intermediate/csr/mqtls.lsiarchi.consulting.csr.pem
-RUN cd /root/ca && openssl ca -batch -passin pass:changeme -config intermediate/openssl.cnf -extensions server_cert -days 365 -notext -md sha256 -in intermediate/csr/mqtls.lsiarchi.consulting.csr.pem -out intermediate/certs/mqtls.lsiarchi.consulting.cert.pem && chmod 444 intermediate/certs/mqtls.lsiarchi.consulting.cert.pem
+RUN cd /root/ca && openssl genrsa -aes256 -passout pass:changeme -out intermediate/private/mq.lsiarchi.consulting.key.pem 2048 && chmod 400 intermediate/private/mq.lsiarchi.consulting.key.pem
+RUN cp /root/ca/intermediate/openssl.cnf /root/ca/intermediate/mq.cnf && printf "\n[SAN]\nsubjectAltName=DNS:mq.lsiarchi.consulting, DNS:localhost" >> /root/ca/intermediate/mq.cnf
+RUN cd /root/ca && openssl req -passin pass:changeme -subj "/C=UK/ST=England/O=LSI Archi Consulting Ltd/CN=mq.lsiarchi.consulting" -reqexts SAN -config /root/ca/intermediate/mq.cnf -key intermediate/private/mq.lsiarchi.consulting.key.pem -new -sha256 -out intermediate/csr/mq.lsiarchi.consulting.csr.pem
+RUN cd /root/ca && openssl ca -batch -passin pass:changeme -config intermediate/openssl.cnf -extensions server_cert -days 365 -notext -md sha256 -in intermediate/csr/mq.lsiarchi.consulting.csr.pem -out intermediate/certs/mq.lsiarchi.consulting.cert.pem && chmod 444 intermediate/certs/mq.lsiarchi.consulting.cert.pem
 
 # Create & sign user cert
 RUN cd /root/ca && openssl genrsa -aes256 -passout pass:changeme -out intermediate/private/mq_user.lsiarchi.consulting.key.pem 2048 && chmod 400 intermediate/private/mq_user.lsiarchi.consulting.key.pem
@@ -37,5 +37,5 @@ RUN cd /root/ca && openssl ca -batch -passin pass:changeme -config intermediate/
 
 # Remove encryption from keys
 RUN cd /root/ca && openssl rsa -passin pass:changeme -in intermediate/private/intermediate.key.pem -out intermediate/private/intermediate.key.pem
-RUN cd /root/ca && openssl rsa -passin pass:changeme -in intermediate/private/mqtls.lsiarchi.consulting.key.pem -out intermediate/private/mqtls.lsiarchi.consulting.key.pem
+RUN cd /root/ca && openssl rsa -passin pass:changeme -in intermediate/private/mq.lsiarchi.consulting.key.pem -out intermediate/private/mq.lsiarchi.consulting.key.pem
 RUN cd /root/ca && openssl rsa -passin pass:changeme -in intermediate/private/mq_user.lsiarchi.consulting.key.pem -out intermediate/private/mq_user.lsiarchi.consulting.key.pem

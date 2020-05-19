@@ -1,0 +1,149 @@
+#!/bin/bash
+
+yum install -y aws-cli wget docker
+service docker start
+wget https://s3.amazonaws.com/amazoncloudwatch-agent/centos/amd64/latest/amazon-cloudwatch-agent.rpm
+rpm -U ./amazon-cloudwatch-agent.rpm
+
+cat << EOF > /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+{
+      "agent": {
+        "metrics_collection_interval": 10,
+        "logfile": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log"
+      },
+      "metrics": {
+        "metrics_collected": {
+          "cpu": {
+            "resources": [
+              "*"
+            ],
+            "measurement": [
+              {"name": "cpu_usage_idle", "rename": "CPU_USAGE_IDLE", "unit": "Percent"},
+              {"name": "cpu_usage_nice", "unit": "Percent"},
+              "cpu_usage_guest"
+            ],
+            "totalcpu": false,
+            "metrics_collection_interval": 10,
+            "append_dimensions": {
+              "customized_dimension_key_1": "customized_dimension_value_1",
+              "customized_dimension_key_2": "customized_dimension_value_2"
+            }
+          },
+          "disk": {
+            "resources": [
+              "/",
+              "/tmp"
+            ],
+            "measurement": [
+              {"name": "free", "rename": "DISK_FREE", "unit": "Gigabytes"},
+              "total",
+              "used"
+            ],
+             "ignore_file_system_types": [
+              "sysfs", "devtmpfs"
+            ],
+            "metrics_collection_interval": 60,
+            "append_dimensions": {
+              "customized_dimension_key_3": "customized_dimension_value_3",
+              "customized_dimension_key_4": "customized_dimension_value_4"
+            }
+          },
+          "diskio": {
+            "resources": [
+              "*"
+            ],
+            "measurement": [
+              "reads",
+              "writes",
+              "read_time",
+              "write_time",
+              "io_time"
+            ],
+            "metrics_collection_interval": 60
+          },
+          "swap": {
+            "measurement": [
+              "swap_used",
+              "swap_free",
+              "swap_used_percent"
+            ]
+          },
+          "mem": {
+            "measurement": [
+              "mem_used",
+              "mem_cached",
+              "mem_total"
+            ],
+            "metrics_collection_interval": 1
+          },
+          "net": {
+            "resources": [
+              "eth0"
+            ],
+            "measurement": [
+              "bytes_sent",
+              "bytes_recv",
+              "drop_in",
+              "drop_out"
+            ]
+          },
+          "netstat": {
+            "measurement": [
+              "tcp_established",
+              "tcp_syn_sent",
+              "tcp_close"
+            ],
+            "metrics_collection_interval": 60
+          },
+          "processes": {
+            "measurement": [
+              "running",
+              "sleeping",
+              "dead"
+            ]
+          }
+        },
+        "aggregation_dimensions" : [["ImageId"], ["InstanceId", "InstanceType"], ["d1"],[]],
+        "force_flush_interval" : 30
+      },
+      "logs": {
+        "logs_collected": {
+          "files": {
+            "collect_list": [
+              {
+                "file_path": "/opt/aws/amazon-cloudwatch-agent/logs/amazon-cloudwatch-agent.log",
+                "log_group_name": "/aws/ec2/mqtls_host",
+                "log_stream_name": "amazon-cloudwatch-agent.log",
+                "timezone": "UTC"
+              },
+              {
+                "file_path": "/var/log/cloud-init.log",
+                "log_group_name": "/aws/ec2/mqtls_host",
+                "log_stream_name": "cloud-init.log",
+                "timezone": "UTC"
+              },
+              {
+                "file_path": "/var/log/messages",
+                "log_group_name": "/aws/ec2/mqtls_host",
+                "log_stream_name": "messages",
+                "timezone": "UTC"
+              },
+              {
+                "file_path": "/var/log/yum.log",
+                "log_group_name": "/aws/ec2/mqtls_host",
+                "log_stream_name": "yum.log",
+                "timezone": "UTC"
+              }
+            ]
+          }
+        },
+        "log_stream_name": "other_logs",
+        "force_flush_interval" : 15
+      }
+    }
+EOF
+
+/opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
+
+`aws ecr get-login --no-include-email --region eu-west-1` 2>/dev/null
+docker run -itd -p 1414:1414 -p 9443:9443 --name mqtls --log-driver=awslogs --log-opt awslogs-region=eu-west-1 --log-opt awslogs-group=/aws/ec2/mqtls_host ${accountId}.dkr.ecr.eu-west-1.amazonaws.com/ibm_mq_tls:latest

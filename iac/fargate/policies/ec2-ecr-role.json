@@ -1,0 +1,24 @@
+{
+ "Version":"2012-10-17",
+ "Statement":[
+    {
+      "Action": [
+        "logs:CreateLogStream",
+        "logs:PutLogEvents",
+        "logs:DescribeLogStreams",
+        "cloudwatch:PutMetricData"
+      ],
+      "Effect": "Allow",
+      "Resource": "arn:aws:logs:eu-west-1:*:*"
+    },
+    {
+      "Sid":"EC2FetchFromECR",
+      "Effect":"Allow",
+      "Action":[
+         "ecr:PullImages",
+         "ecr:ListImages"
+      ],
+    "Resource":"arn:aws:ecr:*:*:repository/ibm_mq_tls"
+  }
+ ]
+}

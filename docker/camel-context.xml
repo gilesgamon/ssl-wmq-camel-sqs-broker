@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans  xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:context="http://www.springframework.org/schema/context"
+        xmlns:camel="http://camel.apache.org/schema/spring"
+        xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://camel.apache.org/schema/spring
+           http://camel.apache.org/schema/spring/camel-spring.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-3.2.xsd
+       ">
+    <context:property-placeholder location="classpath:/broker.properties" />
+
+    <bean id="SSLConfiguration" class="consulting.lsiarchi.mqb.SSLConfiguration">
+        <property name="keystore" value="${ssl.keystore}" />
+        <property name="keystorePassword" value="${ssl.keystore.password.secure}" />
+        <property name="keystoreProvider" value="${ssl.key-store-provider}" />
+        <property name="keystoreType" value="${ssl.key-store-type}" />
+        <property name="truststoreProvider" value="${ssl.key-store-provider}" />
+        <property name="truststore" value="${ssl.truststore}" />
+        <property name="truststorePassword" value="${ssl.truststore.password.secure}" />
+        <property name="certAlias" value="${ibm.certAlias}" />
+        <property name="CipherSuite" value="${ibm.ciphersuite}" />
+        <property name="protocols" value="${ibm.protocols}" />
+        <property name="useIBMCipherMappings" value="true" />
+    </bean>
+
+    <bean id="connectionFactoryConfig" class="org.apache.camel.component.jms.JmsConfiguration">
+        <property name="connectionFactory" ref="secureConnectionFactory" />
+        <property name="concurrentConsumers" value="${ibm.concurrentConsumers}" />
+        <property name="maxConcurrentConsumers" value="${ibm.maxConcurrentConsumers}" />
+        <property name="maxMessagesPerTask" value="${ibm.maxMessagesPerTask}" />
+        <property name="receiveTimeout" value="${ibm.receiveTimeout}" />
+        <property name="idleConsumerLimit" value="${ibm.idleConsumerLimit}" />
+    </bean>
+
+    <bean id="mqConnectionFactory" class="com.ibm.mq.jms.MQQueueConnectionFactory">
+        <property name="hostName" value="${ibm.hostName}" />
+        <property name="port" value="${ibm.port}" />
+        <property name="queueManager" value="${ibm.queueManager}" />
+        <property name="channel" value="${ibm.channel}"/>
+        <property name="transportType" value="${ibm.transportType}"/>
+        <property name="sSLCipherSuite" value="${ibm.ciphersuite}" />
+        <property name="SSLSocketFactory" value="#{SSLConfiguration.SSLSocketFactory}"/>
+    </bean>
+
+    <bean id="ibmMQ" class="org.apache.camel.component.jms.JmsComponent">
+        <property name="configuration" ref="connectionFactoryConfig" />
+    </bean>
+
+    <bean id="secureConnectionFactory" class="org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter">
+        <property name="targetConnectionFactory" ref="mqConnectionFactory" />
+    </bean>
+    
+    <bean id="awsClientConfig" class="consulting.lsiarchi.mqb.awsClientConfig" />
+
+    <bean id="awsRegion" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetClass" value="com.amazonaws.regions.RegionUtils" />
+        <property name="targetMethod" value="getRegion" />
+        <property name="arguments">
+            <list>
+                <value>${aws.region}</value>
+            </list>
+        </property>
+    </bean>
+    <!-- So - I needed this for non-container builds. True container builds use the AWS API, which accesses credentials transparently from AWS_CONTAINER_CREDENTIALS_RELATIVE_URI. To use, uncomment the credentialsProvider bean and where it is referenced as a constructor -->
+<!-- 
+    <bean id="credentialsProvider" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="awsClientConfig" />
+        <property name="targetMethod" value="createCredentialsProvider" />
+        <property name="arguments">
+            <list>
+                <value>${aws.AWS_ACCESS_KEY_ID}</value>
+                <value>${aws.AWS_SECRET_ACCESS_KEY}</value>
+                <value>${aws.AWS_SESSION_TOKEN}</value>
+            </list>
+        </property>
+    </bean> -->
+
+    <bean id="clientConfig" class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
+        <property name="targetObject" ref="awsClientConfig" />
+        <property name="targetMethod" value="createClientConfig" />
+    </bean>
+
+    <bean id="sqsClient" class="com.amazonaws.services.sqs.AmazonSQSClient">
+        <!-- <constructor-arg ref="credentialsProvider" /> -->
+        <constructor-arg ref="clientConfig" />
+        <property name="region" ref="awsRegion"/>
+    </bean>
+
+    <camelContext id="sqsToMq" xmlns="http://camel.apache.org/schema/spring">
+        <propertyPlaceholder id="properties" location="classpath:/broker.properties" />
+        <endpoint id="sqs_request" uri="aws-sqs://${sqs.request_queue_name}?amazonSQSClient=#sqsClient&amp;concurrentConsumers=${sqs.concurrentConsumers}&amp;greedy=${sqs.greedy}&amp;waitTimeSeconds=${sqs.waitTimeSeconds}&amp;delay=${sqs.delay}" />
+        <endpoint id="sqs_response" uri="aws-sqs://${sqs.reply_queue_name}?amazonSQSClient=#sqsClient" />
+
+        <route id="sqsToMq">
+            <from uri="ref:sqs_request" />
+            <to uri="ibmMQ:{{ibm.requestqueue}}" />
+        </route>
+        <route id="mqToMq">
+            <from uri="ibmMQ:{{ibm.requestqueue}}" />
+            <log message="From MQ to MQ ${body} ${date:now:MMDDyy-HHmmss}" loggingLevel="DEBUG"/>
+            <to uri="ibmMQ:{{ibm.responsequeue}}?preserveMessageQos=true" />
+        </route>
+        <route id="mqToSqs">
+            <from uri="ibmMQ:{{ibm.responsequeue}}?preserveMessageQos=true" />
+            <to uri="velocity://mqToSqs.vm" />
+            <!-- <to uri="log:like-to-see-all?level=INFO&amp;showAll=true&amp;multiline=true"/> -->
+            <!-- <removeHeaders pattern="*" excludePattern="CamelAwsSqsMessageId" /> -->
+            <removeHeaders pattern="*" />
+            <to uri="ref:sqs_response" />
+        </route>
+    </camelContext>
+</beans>
